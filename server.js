@@ -22,6 +22,9 @@ function DataObject(invar0, outvar0) {
 var data = [];
 var lastAns = null;
 
+//off or on
+var off = false;
+
 data.push(new DataObject("hi", "whats up"));
 
 client.on("ready", () => {
@@ -38,6 +41,29 @@ client.on("ready", () => {
 client.on("message", msg => {
   //return if input was by user
   if (msg.author.bot) return;
+  
+  if(msg.content == ".load") {
+    fs.readFile("data.txt", function(err, buf) {
+      data = JSON.parse(buf.toString());
+      msg.reply("Loaded " + data.length + " data objects")
+    });
+    return;
+  }else if(msg.content == ".save"){
+    fs.writeFile("data.txt", JSON.stringify(data), (err) => {
+      if (err) console.log(err);
+      console.log("Successfully Written to File.");
+      msg.reply("Saved " + data.length + " data objects");
+    });
+    return;
+  }else if(msg.content == ".off") {
+    off = true;
+  }else if(msg.content == ".on") {
+    off = false;
+    return;
+  }
+  
+  //if is off dont continue
+  if(off) return;
 
   //transform the input
   let input = msg.content
