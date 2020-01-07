@@ -1,0 +1,10 @@
+{
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "4.16.3",
+    "discord.js": "^11.5.1",
+    "arraylist": "^0.1.0"
+  }
+}
