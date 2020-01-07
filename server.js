@@ -5,21 +5,26 @@ const client = new Discord.Client();
 //define the allowed characters
 const allowed = "abcdefghijklmnopqrstuvwxyz 1234567890".split("");
 
-//the data
-var data = ["hi,whats up", "are you luca,nope i am lars"];
-var lastIn = null;
-
-var MAX_VALUE = 0;
 //define what a result is
 function Result(answer) {
   this.cnt = 0;
   this.ans = answer;
 }
 
+//define data objects
+function DataObject(in0, out0) {
+  this.in = in0;
+  this.out = out0;
+}
+
+//the data
+var data = [new DataObject("hi", "wats up"), new DataObject("whats up", "nothing")];
+var lastAns = null;
+
 client.on("ready", () => {
   client.user.setPresence({
     game: {
-      name: "on joe mama",
+      name: "chatting",
       type: "Playing"
     },
     status: "idle"
@@ -50,36 +55,29 @@ client.on("message", msg => {
   //make sure words len is long enough
   if (words.length > 0) {
     //learn this; add to data list, if lastIn is not null
-    if (lastIn != null) {
-      data.push(lastIn + "," + input);
+    if (lastAns != null) {
+      data.push(lastAns + "," + input);
     }
-
-    //the answser
-    let answer = null;
 
     //determine the answer
     //compare how many words are same and add to a result list
     let answers = [];
     //loop through data
-    for (let sdat in data) {
-      //a single data value string split by comma
-      //extract the value
-      let sdsplit = sdat.split(",");
-      let sdwords = sdsplit[0].split(" ");
+    for (let dataobject in data) {
       //create a result
-      let res = new Result();
-      //set the res ans
-      res.ans = sdsplit[1];
+      let res = new Result(dataobject.out);
       //loop through the words list
       for (let wordin in words) {
-        for (let wordsd in sdwords) {
+        for (let worddo in dataobject.in.split(" ")) {
           //if the word and the datword are the
-          if (wordin == wordsd) {
-            res.cnt++;
+          if (wordin == worddo) {
+            res.cnt += 1;
           }
         }
       }
     }
+    
+    msg.reply(answers);
 
     //now find highest result
     let high = new Result();
@@ -94,15 +92,11 @@ client.on("message", msg => {
 
     //set the answer
     if (high.cnt > 0) {
-      answer = high.ans;
-    }
-
-    //set last input
-    if (answer != null) {
+      let answer = high.ans;
       //print answer
       msg.reply(answer);
       //set last answer for learning
-      lastIn = answer;
+      lastAns = answer;
     }
   }
 });
